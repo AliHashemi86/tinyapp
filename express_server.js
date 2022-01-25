@@ -19,6 +19,12 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+app.post('/urls/:id', (req, res) => {
+  console.log(req.params.id);
+  urlDatabase[req.params.id] = req.body.longURL;
+  res.redirect('/urls');
+});
+
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortUrl = generateRandomString();
   console.log("body longURL: ", req.body.longURL);
