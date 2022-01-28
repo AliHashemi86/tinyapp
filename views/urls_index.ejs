@@ -27,9 +27,9 @@
           <tr>
             <td><%= url %></td>
             <td><%= urls[url].longURL %></td>
-            <td><form method="GET" action="/urls/<%= url %>"><button style="border-radius: 10%; border-color:rgb(30, 144, 255); color:rgb(30, 144, 255)">Edit</button> 
+            <td><form method="GET" action="/urls/<%= url %>"><button type="submit" class="btn btn-outline-primary">Edit</button> 
             </form>
-            <td><form method="POST" action="/urls/<%= URL%>>/delete"><button style="border-radius: 10%; border-color: rgb(243, 73, 73);; color: rgb(243, 73, 73)">Delete</button></form>
+            <td><form method="POST" action="/urls/<%= url %>/delete"><button type="submit" class="btn btn-outline-danger">Delete</button></form>
               
             </td>
           
