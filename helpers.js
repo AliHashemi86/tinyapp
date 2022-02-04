@@ -4,13 +4,14 @@ const getUserByEmail = (email, database) => {
       return database[userID];
     }
   }
-  return undefined;
 };
+
 
 const generateRandomString = () => {
   let num = (Math.random() + 1).toString(36).substring(7);
   return num;
 };
+
 
 const ulrsForUser = (id, urls) => {
   let userURL = {};
@@ -28,5 +29,5 @@ const ulrsForUser = (id, urls) => {
 module.exports = {
   getUserByEmail,
   ulrsForUser,
-  generateRandomString
+  generateRandomString,
 };

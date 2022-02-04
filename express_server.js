@@ -8,9 +8,9 @@ const PORT = 8080;
 
 
 const {
-  getUserByEmail, 
-  ulrsForUser, 
-  generateRandomString
+  getUserByEmail,
+  ulrsForUser,
+  generateRandomString,
 } = require('./helpers');
 
 
@@ -59,12 +59,9 @@ const users = {
 
 //Home page
 app.get("/", (req, res) => {
-  res.send("Hello");
+  res.redirect("/urls");
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
 
 app.get("/url.jason", (req, res) => {
   res.json(urlDatabase);
@@ -89,7 +86,7 @@ app.post("/register", (req, res) => {
     res.status(400).send("Both email & password are required");
   } else if (getUserByEmail(userEmail, users)) {
     res.status(400).send("User already exists."
-      );
+    );
   } else {
     const hashedPassword = bcrypt.hashSync(userPassword, salt);
     const id = generateRandomString();
@@ -110,7 +107,7 @@ app.get('/login', (req, res) => {
   if (users[req.session.userID]) {
     res.redirect("/urls");
     return;
-  } 
+  }
   const user = users[req.session['userID']];
   const templateVars = { urls: urlDatabase, user: user};
   res.render('login', templateVars);
@@ -120,11 +117,10 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const id = req.body.userID;
   const password = req.body.password;
-  const email= req.body.email;
+  const email = req.body.email;
   const userCheck = getUserByEmail(email, users);
-  
-  if (userCheck && bcrypt.compareSync[password, userCheck.password]) {
-    req.session(userID) = userCheck.userID,
+  if (userCheck && bcrypt.compareSync(password, userCheck.password)) {
+    req.session["userID"] = userCheck.id;
     res.redirect('/urls');
   } else {
     res.status(403).send("Please enter correct information");
@@ -142,17 +138,18 @@ app.post('/logout', (req, res) => {
 
 //urls page
 app.get("/urls", (req, res) => {
-  const userID = req.session.userID
+  const userID = req.session.userID;
   const user = users[userID];
-  const userURLS = ulrsForUser(userID, urlDatabase)
+
+  const userURLS = ulrsForUser(userID, urlDatabase);
   const templateVars = {
     user: users[userID],
     urls: userURLS
   };
   if (!user) {
     res.status(401);
-  } 
-    res.render("urls_index", templateVars);
+  }
+  res.render("urls_index", templateVars);
 });
 
 
@@ -163,10 +160,10 @@ app.post("/urls", (req, res) => {
     urlDatabase[shortUrl] = {
       longURL: req.body.longURL,
       userID: req.session.userID
-    }
+    };
     res.redirect(`/urls/${shortUrl}`);
   } else {
-    res.status(401).send("You must login")
+    res.status(401).send("You must login");
   }
 });
 
@@ -186,7 +183,11 @@ app.get("/urls/new", (req, res) => {
 
 //Redirect to long url
 app.get("/u/:shortURL", (req, res) => {
+  if (!urlDatabase[req.params.shortURL]) {
+    res.send("This URL does not exist!");
+  }
   const longURL = urlDatabase[req.params.shortURL].longURL;
+  
   res.redirect(longURL);
 });
 
@@ -224,6 +225,9 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
   };
+  if (req.session["userID"] !== urlDatabase[req.params.shortURL]["userID"]) {
+    res.send("You don't have the permission!");
+  }
   res.render("urls_show", templateVars);
 });
 
